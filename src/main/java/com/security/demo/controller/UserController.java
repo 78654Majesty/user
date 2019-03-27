@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author fanglingxiao
@@ -65,10 +67,12 @@ public class UserController {
 
     @PostMapping("queryUserList")
     @Login
-    public ResultApi<List<User>> queryUserList(){
+    public ResultApi<List<User>> queryUserList(HttpServletRequest request){
         List<User> users = userService.queryUserList();
         ResultApi<List<User>> res = new ResultApi<>();
         res.setDate(users);
+        Map<String,Object> currentUser = (Map<String, Object>) request.getAttribute("currentUser");
+        String userName = (String) currentUser.get("userName");
         return res;
     }
 
