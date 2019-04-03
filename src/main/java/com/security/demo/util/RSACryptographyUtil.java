@@ -13,7 +13,7 @@ import java.util.Base64;
 /**
  * RSA工具类
  *
- * @author lucas
+ * @author fanglingxiao
  */
 public class RSACryptographyUtil {
 
@@ -22,7 +22,7 @@ public class RSACryptographyUtil {
     /**
      * 将base64编码后的公钥字符串转成PublicKey实例.
      *
-     * @author Lucas
+     * @author fanglingxiao
      * @date 2019-03-18
      * @param publicKey publicKey
      * @return PublicKey
@@ -42,7 +42,7 @@ public class RSACryptographyUtil {
     /**
      * 将base64编码后的私钥字符串转成PrivateKey实例.
      *
-     * @author Lucas
+     * @author fanglingxiao
      * @date 2019-03-18
      * @param privateKey privateKey
      * @return PublicKey

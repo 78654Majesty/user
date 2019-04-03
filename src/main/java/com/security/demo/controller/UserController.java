@@ -4,15 +4,14 @@ import com.security.demo.auth.Login;
 import com.security.demo.entity.CurrentUser;
 import com.security.demo.entity.User;
 import com.security.demo.service.impl.UserServiceImpl;
+import com.security.demo.util.OssUtil;
 import com.security.demo.util.ResultApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -31,6 +30,9 @@ public class UserController {
     private UserServiceImpl userService;
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
+    @Autowired
+    private OssUtil ossUtil;
 
     @PostMapping("register")
     public ResultApi<String> register(@Valid @RequestBody CurrentUser model){
@@ -76,4 +78,22 @@ public class UserController {
         return res;
     }
 
+    @GetMapping("load")
+    public ResultApi<String> uploadStr(@RequestParam String str){
+        ossUtil.uploadStr(str);
+        ResultApi<String> res = new ResultApi<>();
+        res.setResCode(200);
+        res.setResMsg("登陆成功！");
+        return res;
+    }
+
+    @PostMapping("uploadFile")
+    public ResultApi<String> uploadFile(@RequestParam MultipartFile multipartFile){
+        String url = ossUtil.uploadFile(multipartFile);
+        ResultApi<String> res = new ResultApi<>();
+        res.setResCode(200);
+        res.setResMsg("登陆成功！");
+        res.setDate(url);
+        return res;
+    }
 }
