@@ -1,14 +1,16 @@
 package com.security.demo.util;
 
+import cn.hutool.poi.excel.ExcelReader;
+import cn.hutool.poi.excel.ExcelUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.model.GetObjectRequest;
 import com.aliyun.oss.model.PutObjectResult;
+import com.google.common.collect.ImmutableMap;
 import com.security.demo.config.OssConfigProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,8 +19,11 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author fanglingxiao
@@ -105,5 +110,38 @@ public class OssUtil {
         OSSClient ossClient = new OSSClient(ossConfigProperties.getEndPoint(), ossConfigProperties.getAccessKeyId(), ossConfigProperties.getAccessKeySecret());
         ossClient.getObject(new GetObjectRequest(ossConfigProperties.getBucketName(),objectName),new File(url));
         ossClient.shutdown();
+    }
+
+    /**
+     * 获取服务器文件流
+     * @param urlStr urlStr
+     * @return InputStream
+     */
+    public InputStream getInputStream(String urlStr){
+        InputStream inputStream = null;
+        try {
+            URL url = new URL(urlStr);
+            HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+            //设置超时间为3秒
+            conn.setConnectTimeout(3*1000);
+            //防止屏蔽程序抓取而返回403错误
+            conn.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
+
+            //得到输入流
+            inputStream = conn.getInputStream();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return inputStream;
+    }
+
+    /**
+     * 解析excel
+     */
+    public List<?> readExcel(String url, Class<?> clz,Map<String,String> map){
+        InputStream inp = getInputStream(url);
+        ExcelReader reader = ExcelUtil.getReader(inp, true);
+        reader.setHeaderAlias(map);
+        return reader.readAll(clz);
     }
 }

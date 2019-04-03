@@ -1,7 +1,9 @@
 package com.security.demo.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.security.demo.auth.Login;
 import com.security.demo.entity.CurrentUser;
+import com.security.demo.entity.ExcelDataVO;
 import com.security.demo.entity.User;
 import com.security.demo.service.impl.UserServiceImpl;
 import com.security.demo.util.OssUtil;
@@ -96,4 +98,27 @@ public class UserController {
         res.setDate(url);
         return res;
     }
+
+    @PostMapping("downloadFile")
+    public ResultApi<String> downloadFile(@RequestParam String url){
+        ossUtil.downloadFile(url,"");
+        ResultApi<String> res = new ResultApi<>();
+        res.setResCode(200);
+        res.setResMsg("登陆成功！");
+        res.setDate(url);
+        return res;
+    }
+
+    @PostMapping("readExcel")
+    public ResultApi<String> readExcel(@RequestParam String url){
+        List<ExcelDataVO> list = (List<ExcelDataVO>) ossUtil.readExcel(url, ExcelDataVO.class, ExcelDataVO.DTO);
+        System.out.println(JSONObject.toJSONString(list));
+        ResultApi<String> res = new ResultApi<>();
+        res.setResCode(200);
+        res.setResMsg("登陆成功！");
+        res.setDate(url);
+        return res;
+    }
+
+
 }

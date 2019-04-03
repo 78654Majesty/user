@@ -33,6 +33,8 @@ dependencies {
     //poi
     implementation group: 'org.apache.poi', name: 'poi', version: '4.0.1'
     implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.0.1'
+    //hutool
+    implementation group: 'cn.hutool', name: 'hutool-all', version: '4.5.3'
 
     runtimeOnly 'mysql:mysql-connector-java'
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'

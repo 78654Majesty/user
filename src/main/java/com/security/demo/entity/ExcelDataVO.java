@@ -1,6 +1,16 @@
 package com.security.demo.entity;
 
+import com.google.common.collect.ImmutableMap;
+
+import java.util.Map;
+
 public class ExcelDataVO {
+    public static final Map<String,String> DTO = ImmutableMap.<String,String>builder()
+            .put("姓名","name")
+            .put("年龄","age")
+            .put("居住地","location")
+            .put("职业","job")
+            .build();
 
     /**
      * 姓名
