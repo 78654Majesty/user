@@ -1,5 +1,8 @@
 package com.security.demo.controller;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.poi.excel.ExcelUtil;
+import cn.hutool.poi.excel.ExcelWriter;
 import com.alibaba.fastjson.JSONObject;
 import com.security.demo.auth.Login;
 import com.security.demo.entity.CurrentUser;
@@ -11,12 +14,16 @@ import com.security.demo.util.ResultApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +39,9 @@ public class UserController {
     private UserServiceImpl userService;
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
+    @Value("${fang.export.excel}")
+    private String exportUrl;
 
     @Autowired
     private OssUtil ossUtil;
@@ -120,5 +130,61 @@ public class UserController {
         return res;
     }
 
+    @GetMapping("exportExcel1")
+    public ResultApi<String> exportExcel1(@RequestParam int userId){
+        ExcelDataVO vo = new ExcelDataVO();
+        vo.setName("张三");
+        vo.setAge(23);
+        vo.setLocation("上海");
+        vo.setJob("程序员");
 
+        ExcelWriter writer = ExcelUtil.getWriter(exportUrl+"a.xlsx");
+        writer.addHeaderAlias("name","姓名");
+        writer.addHeaderAlias("age","年龄");
+        writer.addHeaderAlias("location","居住地");
+        writer.addHeaderAlias("job","职业");
+
+        List<ExcelDataVO> list = CollUtil.newArrayList(vo);
+        writer.merge(3,"员工信息");
+        writer.write(list);
+//        writer.flush();
+        writer.close();
+
+        ResultApi<String> res = new ResultApi<>();
+        res.setResCode(200);
+        res.setResMsg("登陆成功！");
+        return res;
+    }
+
+    @GetMapping("exportExcel2")
+    public ResultApi<String> exportExcel2(@RequestParam int userId, HttpServletResponse response){
+        ExcelDataVO vo = new ExcelDataVO();
+        vo.setName("张三");
+        vo.setAge(23);
+        vo.setLocation("上海");
+        vo.setJob("程序员");
+
+        ExcelWriter writer = ExcelUtil.getWriter();
+        writer.addHeaderAlias("name","姓名");
+        writer.addHeaderAlias("age","年龄");
+        writer.addHeaderAlias("location","居住地");
+        writer.addHeaderAlias("job","职业");
+
+        List<ExcelDataVO> list = CollUtil.newArrayList(vo);
+        writer.merge(3,"员工信息");
+        writer.write(list);
+        response.setContentType("application/vnd.ms-excel;charset=utf-8");
+        response.setHeader("Content-Disposition","attachment;filename=test.xls");
+        try (ServletOutputStream outputStream = response.getOutputStream()) {
+            writer.flush(outputStream);
+        } catch (IOException e) {
+            logger.info("error",e);
+        }
+        writer.close();
+
+        ResultApi<String> res = new ResultApi<>();
+        res.setResCode(200);
+        res.setResMsg("登陆成功！");
+        return res;
+    }
 }
