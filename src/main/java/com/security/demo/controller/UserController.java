@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.alibaba.fastjson.JSONObject;
+import com.security.demo.aop.Action;
 import com.security.demo.auth.Login;
 import com.security.demo.entity.CurrentUser;
 import com.security.demo.entity.ExcelDataVO;
@@ -67,15 +68,17 @@ public class UserController {
         if (StringUtils.isEmpty(token)){
             return builder.setResCode(-1).setResMsg("用户不存在！请重新登陆").build();
         }
-        return builder.setResCode(200).setResMsg("注册成功!").setDate(token).build();
+        return builder.setResCode(200).setResMsg("登陆成功!").setDate(token).build();
     }
 
-    @PostMapping("queryUserList")
     @Login
+    @Action
+    @PostMapping("queryUserList")
     public ResultApi queryUserList(HttpServletRequest request){
         List<User> users = userService.queryUserList();
         Map<String,Object> currentUser = (Map<String, Object>) request.getAttribute("currentUser");
         String userName = (String) currentUser.get("userName");
+        logger.info("userName is {}",userName);
         return new ResultApi.Builder<List<User>>().setDate(users).build();
     }
 

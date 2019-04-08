@@ -44,9 +44,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
         if (!checkToken(token)){
             //token有误
-            ResultApi res = new ResultApi();
-            res.setResCode(-1);
-            res.setResMsg("请重新登录");
+            ResultApi res = new ResultApi.Builder<String>().setResCode(-1).setResMsg("请重新登录").build();
             response.setContentType("application/json;charset=utf-8");
             response.getWriter().append(JSONUtils.toJSONString(res));
             return false;
