@@ -47,91 +47,65 @@ public class UserController {
     private OssUtil ossUtil;
 
     @PostMapping("register")
-    public ResultApi<String> register(@Valid @RequestBody CurrentUser model){
-        ResultApi<String> res = new ResultApi<>();
+    public ResultApi register(@Valid @RequestBody CurrentUser model){
 
         if (StringUtils.isEmpty(model.getPassword()) || StringUtils.isEmpty(model.getUserName())
         || StringUtils.isEmpty(model.getRealName())){
-            res.setResCode(-1);
-            res.setResMsg("注册有误！请输入有效参数");
+            return new ResultApi.Builder<String>().setResCode(-1).setResMsg("注册有误！请输入有效参数").build();
         }
         userService.register(model);
-        res.setResCode(200);
-        res.setResMsg("注册成功！");
-        return res;
+        return new ResultApi.Builder<String>().setResCode(200).setResMsg("注册成功!").build();
     }
 
     @PostMapping("login")
-    public ResultApi<String> login(@Valid @RequestBody CurrentUser model){
+    public ResultApi login(@Valid @RequestBody CurrentUser model){
         logger.info("login params {}",model);
 
         String token = userService.login(model);
 
-        ResultApi<String> res = new ResultApi<>();
+        ResultApi.Builder<String> builder = new ResultApi.Builder<>();
         if (StringUtils.isEmpty(token)){
-            res.setResCode(-1);
-            res.setResMsg("用户不存在！请重新登陆");
-            return res;
+            return builder.setResCode(-1).setResMsg("用户不存在！请重新登陆").build();
         }
-        res.setResCode(200);
-        res.setResMsg("登陆成功！");
-        res.setDate(token);
-        return res;
+        return builder.setResCode(200).setResMsg("注册成功!").setDate(token).build();
     }
 
     @PostMapping("queryUserList")
     @Login
-    public ResultApi<List<User>> queryUserList(HttpServletRequest request){
+    public ResultApi queryUserList(HttpServletRequest request){
         List<User> users = userService.queryUserList();
-        ResultApi<List<User>> res = new ResultApi<>();
-        res.setDate(users);
         Map<String,Object> currentUser = (Map<String, Object>) request.getAttribute("currentUser");
         String userName = (String) currentUser.get("userName");
-        return res;
+        return new ResultApi.Builder<List<User>>().setDate(users).build();
     }
 
     @GetMapping("load")
-    public ResultApi<String> uploadStr(@RequestParam String str){
+    public ResultApi uploadStr(@RequestParam String str){
         ossUtil.uploadStr(str);
-        ResultApi<String> res = new ResultApi<>();
-        res.setResCode(200);
-        res.setResMsg("登陆成功！");
-        return res;
+        return new ResultApi.Builder<String>().build();
     }
 
     @PostMapping("uploadFile")
-    public ResultApi<String> uploadFile(@RequestParam MultipartFile multipartFile){
+    public ResultApi uploadFile(@RequestParam MultipartFile multipartFile){
         String url = ossUtil.uploadFile(multipartFile);
-        ResultApi<String> res = new ResultApi<>();
-        res.setResCode(200);
-        res.setResMsg("登陆成功！");
-        res.setDate(url);
-        return res;
+        return new ResultApi.Builder<String>().setDate(url).build();
     }
 
     @PostMapping("downloadFile")
-    public ResultApi<String> downloadFile(@RequestParam String url){
+    public ResultApi downloadFile(@RequestParam String url){
         ossUtil.downloadFile(url,"");
-        ResultApi<String> res = new ResultApi<>();
-        res.setResCode(200);
-        res.setResMsg("登陆成功！");
-        res.setDate(url);
-        return res;
+        return new ResultApi.Builder<String>().setDate(url).build();
     }
 
     @PostMapping("readExcel")
-    public ResultApi<String> readExcel(@RequestParam String url){
+    public ResultApi readExcel(@RequestParam String url){
         List<ExcelDataVO> list = (List<ExcelDataVO>) ossUtil.readExcel(url, ExcelDataVO.class, ExcelDataVO.DTO);
-        System.out.println(JSONObject.toJSONString(list));
-        ResultApi<String> res = new ResultApi<>();
-        res.setResCode(200);
-        res.setResMsg("登陆成功！");
-        res.setDate(url);
-        return res;
+        logger.info("readExcel list is {}",JSONObject.toJSONString(list));
+        return new ResultApi.Builder<String>().setDate(url).build();
     }
 
     @GetMapping("exportExcel1")
-    public ResultApi<String> exportExcel1(@RequestParam int userId){
+    public ResultApi exportExcel1(@RequestParam int userId){
         ExcelDataVO vo = new ExcelDataVO();
         vo.setName("张三");
         vo.setAge(23);
@@ -150,14 +124,11 @@ public class UserController {
 //        writer.flush();
         writer.close();
 
-        ResultApi<String> res = new ResultApi<>();
-        res.setResCode(200);
-        res.setResMsg("登陆成功！");
-        return res;
+        return new ResultApi.Builder<String>().build();
     }
 
     @GetMapping("exportExcel2")
-    public ResultApi<String> exportExcel2(@RequestParam int userId, HttpServletResponse response){
+    public ResultApi exportExcel2(@RequestParam int userId, HttpServletResponse response){
         ExcelDataVO vo = new ExcelDataVO();
         vo.setName("张三");
         vo.setAge(23);
@@ -182,9 +153,37 @@ public class UserController {
         }
         writer.close();
 
-        ResultApi<String> res = new ResultApi<>();
-        res.setResCode(200);
-        res.setResMsg("登陆成功！");
-        return res;
+        return new ResultApi.Builder<String>().build();
     }
+
+    /**
+     * 用于生成带四位数字验证码的图片
+     */
+//    @GetMapping(value = "captcha")
+//    public String imagecode(@RequestParam String captchaId, HttpServletResponse response) throws Exception {
+//        response.setDateHeader("Expires", 0);
+//        response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+//        response.addHeader("Cache-Control", "post-check=0, pre-check=0");
+//        response.setHeader("Pragma", "no-cache");
+//        response.setContentType("image/jpeg");
+//
+//        String s = getTrippleDes().decrypt(captchaId);
+//        String strEnsure = s.substring(0, 4);
+//
+//        OutputStream os = response.getOutputStream();
+//        //返回验证码和图片的map
+//        Map<String, Object> map = CaptchaUtil.getImageCode(86, 37, os, strEnsure);
+//        try {
+//            ImageIO.write((BufferedImage) map.get("image"), "jpg", os);
+//        } catch (IOException e) {
+//            return "";
+//        } finally {
+//            if (os != null) {
+//                os.flush();
+//                os.close();
+//            }
+//        }
+//        return null;
+//    }
+
 }
