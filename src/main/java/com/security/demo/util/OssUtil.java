@@ -117,7 +117,7 @@ public class OssUtil {
      * @param urlStr urlStr
      * @return InputStream
      */
-    public InputStream getInputStream(String urlStr){
+    private InputStream getInputStream(String urlStr){
         InputStream inputStream = null;
         try {
             URL url = new URL(urlStr);
