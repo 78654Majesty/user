@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -106,9 +107,17 @@ public class UserController {
         return new ResultApi.Builder<String>().setDate(url).build();
     }
 
+    /**
+     * 解析excel
+     * @param url
+     * @return
+     */
     @PostMapping("readExcel")
     public ResultApi readExcel(@RequestParam String url){
         List<ExcelDataVO> list = (List<ExcelDataVO>) ossUtil.readExcel(url, ExcelDataVO.class, ExcelDataVO.DTO);
+        if (CollectionUtils.isEmpty(list)){
+            return new ResultApi.Builder<String>().build();
+        }
         ArrayList<ExcelError> errorList = Lists.newArrayList();
         checkListContent(list,errorList);
         logger.info("readExcel list is {}",JSONObject.toJSONString(list));
