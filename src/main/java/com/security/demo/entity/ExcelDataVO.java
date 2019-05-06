@@ -2,6 +2,7 @@ package com.security.demo.entity;
 
 import com.google.common.collect.ImmutableMap;
 
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 public class ExcelDataVO {
@@ -15,16 +16,19 @@ public class ExcelDataVO {
     /**
      * 姓名
      */
+    @NotNull(message = "姓名_不能为空")
     private String name;
 
     /**
      * 年龄
      */
+    @NotNull(message = "年龄_不能为空")
     private Integer age;
 
     /**
      * 居住地
      */
+    @NotNull(message = "居住地_不能为空")
     private String location;
 
     /**

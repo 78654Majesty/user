@@ -4,14 +4,18 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Maps;
 import com.security.demo.aop.Action;
 import com.security.demo.auth.Login;
 import com.security.demo.entity.CurrentUser;
 import com.security.demo.entity.ExcelDataVO;
+import com.security.demo.entity.ExcelError;
 import com.security.demo.entity.User;
 import com.security.demo.service.impl.UserServiceImpl;
 import com.security.demo.util.OssUtil;
 import com.security.demo.util.ResultApi;
+import org.apache.commons.compress.utils.Lists;
+import org.apache.xmlbeans.XmlError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +27,12 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
+import javax.validation.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author fanglingxiao
@@ -103,8 +109,31 @@ public class UserController {
     @PostMapping("readExcel")
     public ResultApi readExcel(@RequestParam String url){
         List<ExcelDataVO> list = (List<ExcelDataVO>) ossUtil.readExcel(url, ExcelDataVO.class, ExcelDataVO.DTO);
+        ArrayList<ExcelError> errorList = Lists.newArrayList();
+        checkListContent(list,errorList);
         logger.info("readExcel list is {}",JSONObject.toJSONString(list));
         return new ResultApi.Builder<String>().setDate(url).build();
+    }
+
+    private void checkListContent(List<ExcelDataVO> list, ArrayList<ExcelError> errorList) {
+        //收集excel是否内容重复
+        Map<String,String> map = Maps.newHashMap();
+        list.forEach(model->{
+            //Validator注解错误信息
+            ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+            Validator validator = factory.getValidator();
+            Set<ConstraintViolation<ExcelDataVO>> violations = validator.validate(model);
+            if (violations.isEmpty()) {
+                return;
+            }
+            violations.forEach(t -> {
+                ExcelError error = new ExcelError();
+                error.setReason(t.getMessage().split("_")[1]);
+                error.setErrorLine("");
+                error.setFieldName(t.getMessage().split("_")[0]);
+                errorList.add(error);
+            });
+        });
     }
 
     @GetMapping("exportExcel1")
