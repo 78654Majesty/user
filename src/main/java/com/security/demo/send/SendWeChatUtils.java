@@ -20,18 +20,20 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
- * @ClassName: SendMsgUtils
- * @Author: shenlele
- * @Date: 2018/10/11 14:08
- * @Description:
+ * description
+ * @author fanglingxiao
+ * @date 14:49 2019/5/27
  */
 @Service
 public class SendWeChatUtils {
 
     private CloseableHttpClient httpClient;
-    private HttpPost httpPost;//用于提交登陆数据
-    private HttpGet httpGet;//用于获得登录后的页面
+    //用于提交登陆数据
+    private HttpPost httpPost;
+    //用于获得登录后的页面
+    private HttpGet httpGet;
     public static final String CONTENT_TYPE = "Content-Type";
     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 

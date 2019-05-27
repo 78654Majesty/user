@@ -9,8 +9,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.Properties;
 
+
 /**
- * Created by wuyabin on 2018/10/15.
+ * description
+ * @author fanglingxiao
+ * @date 14:49 2019/5/27
  */
 @Service
 class SendMail {
