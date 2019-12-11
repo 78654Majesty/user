@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+<!--    <property name="log.dir" value="D:/temp/log/"></property> //这里为日志的存储地址-->
+<!--    <property name="log.dir" value="/usr/local/app_service/logs/crmlogs/"></property> //这里为日志的存储地址-->
+    <property name="log.dir" value="/Users/james/Documents/workspace/logs/user/"></property> //这里为日志的存储地址
+<!--    <property name="log.dir" value=""></property> //这里为日志的存储地址-->
+    <!-- ConsoleAppender 控制台级别日志-->
+    <appender name="Console_Log" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>
+                <!-- %logger{36} 输出包名+类名-->
+                <!--%M 输出方法名-->
+                %d{yyyy-MM-dd HH:mm:ss.SSS} -- %magenta([%thread]) %highlight(%-5level) %logger{36}.%M - %msg%n
+            </pattern>
+        </layout>
+    </appender>
+    <!--RollingFileAppender 文件日志-->
+    <!--根据日志级别分文件存储-->
+    <appender name="Info_File" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.dir}logs/Info_File.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss.SSS} -- [%thread] %-5level %logger{36}.%M - %msg%n
+            </pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <!--日志的存档名-->
+            <fileNamePattern>${log.dir}/Info_File-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- each file should be at most 100MB, keep 30 days worth of history, but at most 10GB -->
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+    <appender name="Error_File" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.dir}logs/Error_File.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss.SSS} -- [%thread] %-5level %logger{36}.%M - %msg%n
+            </pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>${log.dir}/Error_File-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- each file should be at most 100MB, keep 30 days worth of history, but at most 10GB -->
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+    <!--配置总的日志监听级别-->
+    <root level="info">
+        <appender-ref ref="Console_Log"></appender-ref>
+        <appender-ref ref="Info_File"></appender-ref>
+        <appender-ref ref="Error_File"></appender-ref>
+    </root>
+</configuration>
